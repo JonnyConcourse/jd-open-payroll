@@ -91,7 +91,6 @@ async function GovernmentOverview({ year }: { year: number }) {
         <HorizontalBarChart
           data={agencyBarData}
           valueLabel="Employees"
-          formatValue={formatNumber}
         />
       </section>
 

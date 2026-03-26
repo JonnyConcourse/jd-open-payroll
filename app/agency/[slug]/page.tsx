@@ -37,7 +37,7 @@ async function AgencyContent({ slug, year }: { slug: string; year: number }) {
   ];
 
   const titleBarData = detail.topTitles.map((t) => ({
-    name: t.title.length > 35 ? t.title.slice(0, 34) + '…' : t.title,
+    name: t.title.length > 35 ? t.title.slice(0, 34) + '\u2026' : t.title,
     value: t.count,
     href: `/title/${t.slug}`,
   }));
@@ -77,7 +77,7 @@ async function AgencyContent({ slug, year }: { slug: string; year: number }) {
       <div className="grid gap-8 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 text-lg font-semibold text-gray-800">Top Job Titles</h2>
-          <HorizontalBarChart data={titleBarData} valueLabel="Employees" formatValue={formatNumber} />
+          <HorizontalBarChart data={titleBarData} valueLabel="Employees" />
         </section>
 
         <section>

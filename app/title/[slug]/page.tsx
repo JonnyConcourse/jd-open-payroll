@@ -34,12 +34,12 @@ async function TitleContent({ slug, year }: { slug: string; year: number }) {
   const statItems = [
     { label: 'Employees', value: formatNumber(detail.count), subtext: `with this title in ${year}` },
     { label: 'Median Salary', value: formatCurrency(detail.medianSalary), subtext: 'annual YTD earnings' },
-    { label: 'Salary Range', value: `${formatCurrency(detail.minSalary, true)} – ${formatCurrency(detail.maxSalary, true)}`, subtext: 'min to max' },
+    { label: 'Salary Range', value: `${formatCurrency(detail.minSalary, true)} \u2013 ${formatCurrency(detail.maxSalary, true)}`, subtext: 'min to max' },
     { label: 'OT as % of Pay', value: `${otPercent}%`, subtext: 'avg overtime share' },
   ];
 
   const agencyBarData = detail.agencyDistribution.slice(0, 12).map((a) => ({
-    name: a.agency.length > 35 ? a.agency.slice(0, 34) + '…' : a.agency,
+    name: a.agency.length > 35 ? a.agency.slice(0, 34) + '\u2026' : a.agency,
     value: a.count,
     href: `/agency/${a.slug}`,
   }));
@@ -84,7 +84,7 @@ async function TitleContent({ slug, year }: { slug: string; year: number }) {
       <div className="grid gap-8 lg:grid-cols-2">
         <section>
           <h2 className="mb-3 text-lg font-semibold text-gray-800">Agencies Employing This Title</h2>
-          <HorizontalBarChart data={agencyBarData} valueLabel="Employees" formatValue={formatNumber} />
+          <HorizontalBarChart data={agencyBarData} valueLabel="Employees" />
         </section>
 
         <section>
