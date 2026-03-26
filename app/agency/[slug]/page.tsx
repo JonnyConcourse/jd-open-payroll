@@ -12,7 +12,6 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { YearSelector } from '@/components/ui/YearSelector';
 import { formatCurrency, formatNumber, ordinal } from '@/lib/format';
 import { buildSlugMap } from '@/lib/slugs';
-import { EmployeeRecord } from '@/types/payroll';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -42,32 +41,32 @@ async function AgencyContent({ slug, year }: { slug: string; year: number }) {
     href: `/title/${t.slug}`,
   }));
 
-  const earnerColumns: Column<EmployeeRecord>[] = [
-    { key: 'fullName', header: 'Name', sortable: true, href: (r) => `/employee/${r.payrollId}` },
-    { key: 'title', header: 'Title', sortable: true, href: (r) => `/title/${r.titleSlug}` },
-    {
-      key: 'ytdEarnings',
-      header: 'Total Earnings',
-      sortable: true,
-      render: (r) => formatCurrency(r.ytdEarnings),
-    },
-    {
-      key: 'overtimePay',
-      header: 'Overtime',
-      sortable: true,
-      render: (r) => formatCurrency(r.overtimePay),
-    },
+  const earnerData = detail.topEarners.map((e) => ({
+    ...e,
+    ytdEarningsDisplay: formatCurrency(e.ytdEarnings),
+    overtimePayDisplay: formatCurrency(e.overtimePay),
+    employeeHref: `/employee/${e.payrollId}`,
+    titleHref: `/title/${e.titleSlug}`,
+  }));
+
+  const earnerColumns: Column<(typeof earnerData)[0]>[] = [
+    { key: 'fullName', header: 'Name', sortable: true, hrefKey: 'employeeHref' },
+    { key: 'title', header: 'Title', sortable: true, hrefKey: 'titleHref' },
+    { key: 'ytdEarnings', header: 'Total Earnings', sortable: true, displayKey: 'ytdEarningsDisplay' },
+    { key: 'overtimePay', header: 'Overtime', sortable: true, displayKey: 'overtimePayDisplay' },
   ];
 
-  const titleColumns: Column<(typeof detail.allTitles)[0]>[] = [
-    { key: 'title', header: 'Title', sortable: true, href: (r) => `/title/${r.slug}` },
-    { key: 'count', header: '# Employees', sortable: true, render: (r) => formatNumber(r.count) },
-    {
-      key: 'medianSalary',
-      header: 'Median Salary',
-      sortable: true,
-      render: (r) => formatCurrency(r.medianSalary),
-    },
+  const titleData = detail.allTitles.map((t) => ({
+    ...t,
+    countDisplay: formatNumber(t.count),
+    medianSalaryDisplay: formatCurrency(t.medianSalary),
+    titleHref: `/title/${t.slug}`,
+  }));
+
+  const titleColumns: Column<(typeof titleData)[0]>[] = [
+    { key: 'title', header: 'Title', sortable: true, hrefKey: 'titleHref' },
+    { key: 'count', header: '# Employees', sortable: true, displayKey: 'countDisplay' },
+    { key: 'medianSalary', header: 'Median Salary', sortable: true, displayKey: 'medianSalaryDisplay' },
   ];
 
   return (
@@ -108,8 +107,8 @@ async function AgencyContent({ slug, year }: { slug: string; year: number }) {
         <h2 className="mb-3 text-lg font-semibold text-gray-800">Top 20 Earners</h2>
         <SortableTable
           columns={earnerColumns}
-          data={detail.topEarners}
-          rowKey={(r) => r.payrollId}
+          data={earnerData}
+          rowKey="payrollId"
           pageSize={20}
         />
       </section>
@@ -120,8 +119,8 @@ async function AgencyContent({ slug, year }: { slug: string; year: number }) {
         </h2>
         <SortableTable
           columns={titleColumns}
-          data={detail.allTitles}
-          rowKey={(r) => r.title}
+          data={titleData}
+          rowKey="title"
           pageSize={25}
         />
       </section>

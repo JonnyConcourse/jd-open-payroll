@@ -11,7 +11,6 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { YearSelector } from '@/components/ui/YearSelector';
 import { formatCurrency, formatNumber } from '@/lib/format';
 import { buildSlugMap } from '@/lib/slugs';
-import { EmployeeRecord } from '@/types/payroll';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -44,21 +43,19 @@ async function TitleContent({ slug, year }: { slug: string; year: number }) {
     href: `/agency/${a.slug}`,
   }));
 
-  const employeeColumns: Column<EmployeeRecord>[] = [
-    { key: 'fullName', header: 'Name', sortable: true, href: (r) => `/employee/${r.payrollId}` },
-    { key: 'agency', header: 'Agency', sortable: true, href: (r) => `/agency/${r.agencySlug}` },
-    {
-      key: 'ytdEarnings',
-      header: 'Total Earnings',
-      sortable: true,
-      render: (r) => formatCurrency(r.ytdEarnings),
-    },
-    {
-      key: 'overtimePay',
-      header: 'Overtime',
-      sortable: true,
-      render: (r) => formatCurrency(r.overtimePay),
-    },
+  const employeeData = detail.employees.map((e) => ({
+    ...e,
+    ytdEarningsDisplay: formatCurrency(e.ytdEarnings),
+    overtimePayDisplay: formatCurrency(e.overtimePay),
+    employeeHref: `/employee/${e.payrollId}`,
+    agencyHref: `/agency/${e.agencySlug}`,
+  }));
+
+  const employeeColumns: Column<(typeof employeeData)[0]>[] = [
+    { key: 'fullName', header: 'Name', sortable: true, hrefKey: 'employeeHref' },
+    { key: 'agency', header: 'Agency', sortable: true, hrefKey: 'agencyHref' },
+    { key: 'ytdEarnings', header: 'Total Earnings', sortable: true, displayKey: 'ytdEarningsDisplay' },
+    { key: 'overtimePay', header: 'Overtime', sortable: true, displayKey: 'overtimePayDisplay' },
   ];
 
   const comparisonData = [
@@ -107,8 +104,8 @@ async function TitleContent({ slug, year }: { slug: string; year: number }) {
         </h2>
         <SortableTable
           columns={employeeColumns}
-          data={detail.employees}
-          rowKey={(r) => r.payrollId}
+          data={employeeData}
+          rowKey="payrollId"
           pageSize={50}
         />
       </section>
