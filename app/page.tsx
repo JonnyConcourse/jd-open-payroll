@@ -117,6 +117,7 @@ async function GovernmentOverview({ year }: { year: number }) {
 export default async function HomePage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const years = await getAvailableYears();
+  const apiUnavailable = years.length === 0;
   const year = sp.year ? parseInt(sp.year) : (years[0] ?? new Date().getFullYear());
 
   return (
@@ -132,6 +133,12 @@ export default async function HomePage({ searchParams }: PageProps) {
           <YearSelector years={years} current={year} />
         </Suspense>
       </div>
+
+      {apiUnavailable && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <strong>Data unavailable.</strong> The NJ payroll API could not be reached. This may be a temporary outage or a missing API token. Please try again later.
+        </div>
+      )}
 
       <Suspense
         fallback={
