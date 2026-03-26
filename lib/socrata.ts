@@ -27,17 +27,22 @@ async function socrataFetch<T>(params: Record<string, string>): Promise<T[]> {
   for (const [k, v] of Object.entries(params)) {
     url.searchParams.set(k, v);
   }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const res = await fetch(url.toString(), {
       headers: headers(),
       next: { revalidate: 3600 },
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     if (!res.ok) {
       console.error(`Socrata API error: ${res.status} ${res.statusText} — ${url}`);
       return [];
     }
-    return res.json() as Promise<T[]>;
+    return (await res.json()) as T[];
   } catch (err) {
+    clearTimeout(timeout);
     console.error(`Socrata fetch exception: ${err} — ${url}`);
     return [];
   }

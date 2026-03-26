@@ -28,7 +28,7 @@ async function GovernmentOverview({ year }: { year: number }) {
   }));
 
   const agencyBarData = sortedByHeadcount.map((a) => ({
-    name: a.name.length > 35 ? a.name.slice(0, 34) + '…' : a.name,
+    name: a.name.length > 35 ? a.name.slice(0, 34) + '\u2026' : a.name,
     value: a.headcount,
     href: `/agency/${a.slug}`,
   }));
@@ -140,20 +140,22 @@ export default async function HomePage({ searchParams }: PageProps) {
         </div>
       )}
 
-      <Suspense
-        fallback={
-          <div className="animate-pulse space-y-4">
-            <div className="grid grid-cols-4 gap-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-24 rounded-xl bg-gray-200" />
-              ))}
+      {!apiUnavailable && (
+        <Suspense
+          fallback={
+            <div className="animate-pulse space-y-4">
+              <div className="grid grid-cols-4 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="h-24 rounded-xl bg-gray-200" />
+                ))}
+              </div>
+              <div className="h-96 rounded-xl bg-gray-200" />
             </div>
-            <div className="h-96 rounded-xl bg-gray-200" />
-          </div>
-        }
-      >
-        <GovernmentOverview year={year} />
-      </Suspense>
+          }
+        >
+          <GovernmentOverview year={year} />
+        </Suspense>
+      )}
     </div>
   );
 }
